@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Barista Hafıza Oyunu</title>
+    <style>
+        body {
+            background-color: #121212;
+            color: #e0e0e0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0;
+            padding: 20px;
+        }
+        h1 {
+            color: #d4a373;
+            text-align: center;
+            margin-bottom: 5px;
+        }
+        p {
+            font-size: 14px;
+            color: #888;
+            margin-bottom: 20px;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(4, 75px);
+            gap: 12px;
+        }
+        .card {
+            width: 75px;
+            height: 75px;
+            background-color: #2c1b18;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 35px;
+            cursor: pointer;
+            border-radius: 12px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.5);
+            transition: transform 0.2s;
+            user-select: none;
+        }
+        .card:active {
+            transform: scale(0.95);
+        }
+        .matched {
+            background-color: #1a1a1a;
+            box-shadow: none;
+            cursor: default;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Barista Memory</h1>
+    <p>Aynı desenleri eşleştir! Başrol: Kuğu 🦢</p>
+    
+    <div class="grid" id="grid"></div>
+
+    <script>
+        const simgeler = ['🦢', '🌷', '🌿', '☕', '🥛', '🧊', '🥐', '🤎'];
+        let kartlar = [...simgeler, ...simgeler];
+        kartlar.sort(() => 0.5 - Math.random());
+
+        const grid = document.getElementById('grid');
+        let secilenKartlar = [];
+        let secilenIdler = [];
+        let eslesenCiftSayisi = 0;
+
+        function oyunKur() {
+            for (let i = 0; i < kartlar.length; i++) {
+                const kart = document.createElement('div');
+                kart.classList.add('card');
+                kart.setAttribute('data-id', i);
+                kart.addEventListener('click', kartCevir);
+                grid.appendChild(kart);
+            }
+        }
+
+        function kartCevir() {
+            let kartId = this.getAttribute('data-id');
+            
+            if (secilenIdler.includes(kartId) || secilenKartlar.length === 2 || this.classList.contains('matched')) {
+                return;
+            }
+
+            this.textContent = kartlar[kartId];
+            this.style.backgroundColor = '#d4a373';
+            
+            secilenKartlar.push(kartlar[kartId]);
+            secilenIdler.push(kartId);
+
+            if (secilenKartlar.length === 2) {
+                setTimeout(eslesmeKontrol, 600);
+            }
+        }
+
+        function eslesmeKontrol() {
+            const tumKartlar = document.querySelectorAll('.card');
+            const secilen1 = secilenIdler[0];
+            const secilen2 = secilenIdler[1];
+
+            if (secilenKartlar[0] === secilenKartlar[1]) {
+                tumKartlar[secilen1].classList.add('matched');
+                tumKartlar[secilen2].classList.add('matched');
+                eslesenCiftSayisi++;
+                
+                if (eslesenCiftSayisi === simgeler.length) {
+                    setTimeout(() => alert('Harika iş! Tüm siparişleri yetiştirdin! ☕🦢'), 300);
+                }
+            } else {
+                tumKartlar[secilen1].textContent = '';
+                tumKartlar[secilen1].style.backgroundColor = '#2c1b18';
+                tumKartlar[secilen2].textContent = '';
+                tumKartlar[secilen2].style.backgroundColor = '#2c1b18';
+            }
+
+            secilenKartlar = [];
+            secilenIdler = [];
+        }
+
+        oyunKur();
+    </script>
+</body>
+</html>
